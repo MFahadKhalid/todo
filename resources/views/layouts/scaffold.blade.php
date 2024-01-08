@@ -10,7 +10,7 @@
     @include('partial.style')
     @stack('styles')
 </head>
-<body id="Body">
+<body>
     @include('partial.header')
     @yield('content')
     @include('partial.script')
