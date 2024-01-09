@@ -4,23 +4,23 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Todo;
+use DataTables;
 use Validator;
+use File;
 
 class TodoController extends Controller
 {
-    public function index(){
-        $data['todos'] = Todo::where('user_id' , auth()->user()->id)->get();
-        $view = view('pages.todo',$data);
-        return response(['success' => true, 'data' => $view->render()]);
+    public function fetch(){
+        $todo = Todo::where('user_id' , auth()->user()->id)->orderBy('id' , 'DESC')->get();
+        return response()->json(['todo' => $todo]);
     }
     public function store(Request $request){
-        $validator = Validator::make($request->all(),[
+        $validator = $request->validate([
             'title' => 'required|max:255',
+            'image' => 'image',
             'description' => 'max:8000',
         ]);
-        if($validator->fails()){
-            return response()->json(['status' => 400, 'errors' => $validator->messages()]);
-        }else{
+        if(auth()->user()->id){
             $todo = new Todo;
             $todo->user_id = auth()->user()->id;
             $todo->title = $request->input('title');
@@ -28,7 +28,7 @@ class TodoController extends Controller
             if($request->file('image')){
                 $image = $request->file('image');
                 $imageName = 'todo' . '-' . time() . '.' . $image->getClientOriginalExtension();
-                $image->move('upload/todo',$imageName);
+                $image->move('storage/upload/todo',$imageName);
                 $todo->image = $imageName;
             }
             $todo->save();
@@ -44,23 +44,26 @@ class TodoController extends Controller
         }
     }
     public function update(Request $request , $id){
-        $validator = Validator::make($request->all(),[
+        $validator = $request->validate([
             'title' => 'required|max:255',
+            'image' => 'image',
             'description' => 'max:8000',
         ]);
-        if($validator->fails()){
-            return response()->json(['status' => 400, 'errors' => $validator->messages()]);
-        }else{
+        if(auth()->user()->id){
             $todo = Todo::find($id);
             if($todo){
                 $todo->user_id = auth()->user()->id;
                 $todo->title = $request->input('title');
                 $todo->description = $request->input('description');
                 $imageData = Todo::where('id',$id)->firstorfail();
+                $path = 'storage/upload/todo/'.$todo->image;
+                if(File::exists($path)){
+                    File::delete($path);
+                }
                 if($request->file('image')){
                     $image = $request->file('image');
                     $imageName = 'todo' . '-' . time() . '.' . $image->getClientOriginalExtension();
-                    $image->move('upload/todo',$imageName);
+                    $image->move('storage/upload/todo',$imageName);
                     $todo->image = $imageName;
                 }
                 else{
@@ -75,6 +78,10 @@ class TodoController extends Controller
     }
     public function delete($id){
         $todo = Todo::find($id);
+        $path = 'storage/upload/todo/'.$todo->image;
+        if(File::exists($path)){
+            File::delete($path);
+        }
         $todo->delete();
         return response()->json(['status' => 200 , 'message' => 'Task deleted']);
     }

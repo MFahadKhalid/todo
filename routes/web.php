@@ -25,10 +25,16 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::get('/' , [FrontendController::class , 'index'])->name('index');
 
 
+
+Route::prefix('todo')->name('todo.')->controller(TodoController::class)->group(function(){
 //Todo
-Route::get('todo' , [TodoController::class , 'index'])->name('todo');
-Route::post('todo/store' , [TodoController::class , 'store'])->name('todo.store');
-Route::get('todo/edit/{id}' , [TodoController::class , 'edit'])->name('todo.edit');
-Route::post('todo/update/{id}' , [TodoController::class , 'update'])->name('todo.update');
-Route::delete('todo/delete/{id}' , [TodoController::class , 'delete'])->name('todo.delete');
-Route::post('task/completed/{id}' , [TodoController::class , 'TaskCompleted'])->name('TaskCompleted');
+
+Route::get('/fetch' ,  'fetch')->name('fetch');
+Route::post('/store' ,  'store')->name('store');
+Route::get('/edit/{id}' ,  'edit')->name('edit');
+Route::post('/update/{id}' ,  'update')->name('update');
+Route::delete('/delete/{id}' ,  'delete')->name('delete');
+Route::post('/task/completed/{id}' ,  'TaskCompleted')->name('TaskCompleted');
+
+
+});

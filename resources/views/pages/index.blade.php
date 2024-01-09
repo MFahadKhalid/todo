@@ -15,64 +15,26 @@
    <div style="float: right;" class="">
       <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#CreateTodo">Create Task</button>
    </div>
-   {{--
-   <div class="mt-5"></div>
-   --}}
-   <div id="printTodo" >
-      <table class="table table-striped mt-5">
+   <div>
+      <table class="table table-striped mt-5" id="datatable">
          <thead>
             <tr>
-               <th>ID</th>
-               <th>Title</th>
+                <th>#</th>
+                <th>Title</th>
                <th>Image</th>
                <th>Description</th>
                <th>Task</th>
                <th>Action</th>
             </tr>
          </thead>
-         <tbody>
-            @forelse ($todos as $index=>$todo)
-            <tr>
-               <td>{{ ++$index }}</td>
-               <td>{{ $todo->title }}</td>
-               <td>
-                  @if (!empty($todo->image))
-                  <img class="img-thumbnail" src="{{ asset('upload/todo/'.$todo->image) }}" width="100px" alt="{{ $todo->image }}">
-                  @else
-                  <img class="img-thumbnail" src="{{ asset('assets/img/no-image-icon-6.png') }}" width="50px" alt="no-image-icon-6.png">
-                  @endif
-               </td>
-               <td>{{ $todo->description }}</td>
-               <td>
-                  @if ($todo->status == 1)
-                  <button style="border: none; margin-right: 4px;" class="badge bg-success">Completed</button>
-                  @else
-                  <button style="border: none; margin-right: 4px;" class="badge bg-default">
-                     <div style="display: none; height: 14px; width: 13px;" class="task_loader{{ $todo->id }} spinner-border text-success" role="status">
+         <tbody class="PrintTodo">
+            <tr class="todoLoader" style="display: none;">
+                <td class="text-center" colspan="6">
+                    <div class="spinner-border" role="status">
                         <span class="sr-only">Loading...</span>
-                     </div>
-                     <a class="text-dark" style="text-decoration: none;" onClick="TaskDone($(this),{{$todo->id}})" href="javascript:;">Mark as Completed</a>
-                  </button>
-                  @endif
-               </td>
-               <td>
-                  <button style="border: none; margin-right: 4px;" value="{{ $todo->id }}" class="edit_todo_btn badge bg-warning">
-                     <div style="display: none; height: 14px; width: 13px;" class="Edit_loader{{ $todo->id }} spinner-border" role="status">
-                        <span class="sr-only">Loading...</span>
-                     </div>
-                     Edit
-                  </button>
-                  <button style="border: none; margin-right: 4px;" value="{{ $todo->id }}" class="delete_todo_btn badge bg-danger">
-                     <div style="display: none; height: 14px; width: 13px;" class="delete_loader{{ $todo->id }} spinner-border" role="status">
-                        <span class="sr-only">Loading...</span>
-                     </div>
-                     Delete
-                  </button>
-               </td>
+                      </div>
+                </td>
             </tr>
-            @empty
-            <td class="text-center" colspan="6">No record found</td>
-            @endforelse
          </tbody>
       </table>
    </div>
@@ -87,21 +49,25 @@
          </div>
          <div class="modal-body">
             <ul id="todoErrorList"></ul>
-            <form method="POST" id="AddTodo" enctype="multipart/form-data">
+            <form method="POST" id="AddTodo" enctype="multipart/form-data" class="TodoValidate">
                <div class="todoModal">
                   <div class="row">
-                     <div class="col-md-12 mb-3">
+
+                <div class="col-md-12 mb-3">
                         <label for="">Title <span class="text-danger">*</span></label>
                         <input type="text" class="form-control todo_title" name="title">
+                        <small class="text-danger" id="titleErrors"></small>
                      </div>
                      <div class="col-md-12 mb-3">
                         <label for="">Image</label>
                         <input type="file" name="image" class="form-control todo_image" id="image">
-                     </div>
+                        <small class="text-danger" id="imageErrors"></small>
+                    </div>
                      <div class="col-md-12 mb-3">
                         <label for="">Description</label>
                         <textarea name="description" class="form-control" id="description" cols="15" rows="5"></textarea>
-                     </div>
+                        <small class="text-danger" id="descriptionErrors"></small>
+                    </div>
                   </div>
                </div>
                <div style="float: right;">
@@ -135,15 +101,18 @@
                      <div class="col-md-12 mb-3">
                         <label for="">Title <span class="text-danger">*</span></label>
                         <input type="text" class="form-control edit_todo_title" name="title" id="edit_todo_title">
+                        <small class="text-danger" id="EditTitleErrors"></small>
                      </div>
                      <div class="col-md-12 mb-3">
                         <label for="">Image </label>
                         <input type="file" name="image" class="form-control todo_image" id="image">
                         <span id="edit_todo_image"></span>
+                        <small class="text-danger" id="EditimageErrors"></small>
                      </div>
                      <div class="col-md-12 mb-3">
                         <label for="">Description </label>
                         <textarea name="description" class="form-control" id="edit_todo_description" cols="15" rows="5"></textarea>
+                        <small class="text-danger" id="EditdescriptionErrors"></small>
                      </div>
                   </div>
                </div>
@@ -191,20 +160,10 @@
 </div>
 @endsection
 @push('scripts')
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
 <script>
-   function routeToTodo(elm){
-       $.ajax({
-           url: "{{ route('todo') }}",
-           type: "GET",
-           data: {},
-           success: function (res){
-               $('#printTodo').html(res.data);
-           },
-           error : function(res){
-               toastr.error('Something went wrong');
-           }
-       })
-   }
+
 
    $(document).ready(function (){
        $.ajaxSetup({
@@ -212,7 +171,49 @@
               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
           }
        });
-      $(document).on('submit' ,'#AddTodo', function(e){
+       fetchTodo();
+       function fetchTodo(){
+
+            $.ajax({
+                type: "GET",
+                url: "{{ route('todo.fetch') }}",
+                dataType: 'json',
+                beforeSend: function(res){
+                    $('.todoLoader').show();
+                },
+                success: function(res){
+                    $('.todoLoader').hide();
+                    $('.PrintTodo').html("");
+                    $.each(res.todo , function(key,item){
+                        var append = "<tr class='post'>"+
+                            "<td>"+ ++key +"</td>"+
+                            "<td>"+item.title+"</td>"+
+                            "<td>"+
+                            (""+item.image+"" != 0 ? "<img class='img-thumbnail' src='storage/upload/todo/"+item.image+"' width='100px' alt="+item.image+">" : "<img class='img-thumbnail' src='assets/img/no-image-icon-6.png' width='50px' alt='no-image-icon-6.png'>")+
+                            "</td>"+
+                            "<td>"+item.description+"</td>"+
+                            "<td>"+
+                            (""+item.status+"" == 1 ? "<button style='border: none; margin-right: 4px;' id='completed' class='badge bg-success'>Completed</button>" : "<div class='markAsComplete"+item.id+"'><button style='border: none; margin-right: 4px;' class='badge bg-default'><div style='display: none; height: 14px; width: 13px;' class='task_loader"+item.id+" spinner-border text-success' role='status'><span class='sr-only'>Loading...</span></div><a id='' class='text-dark' style='text-decoration: none;' onClick='TaskDone($(this),"+item.id+")' href='javascript:;'>Mark as Completed</a></button></div>")+
+                            "</td>"+
+                            "<td><button style='border: none; margin-right: 4px;' value="+item.id+" class='edit_todo_btn badge bg-warning'>"+
+                            "<div style='display: none; height: 14px; width: 13px;' class='Edit_loader"+item.id+" spinner-border' role='status'>"+
+                            "<span class='sr-only'>Loading...</span>"+
+                            "</div>"+
+                            "Edit"+
+                            "</button>"+
+                            "<button style='border: none; margin-right: 4px;' value="+item.id+" class='delete_todo_btn badge bg-danger'>"+
+                            "<div style='display: none; height: 14px; width: 13px;' class='delete_loader"+item.id+" spinner-border' role='status'>"+
+                            "<span class='sr-only'>Loading...</span>"+
+                            "</div>"+
+                            "Delete"+
+                            "</button>"+
+                            "</td>";
+                        $(".PrintTodo").append(append);
+                    });
+                }
+               });
+            }
+               $(document).on('submit' ,'#AddTodo', function(e){
           e.preventDefault();
           let formData = new FormData($('#AddTodo')[0]);
           $.ajax({
@@ -225,26 +226,33 @@
                    $('.loader').show();
                },
                success: function(res){
-                   if(res.status == 400){
                        $('.loader').hide();
-                       $('#todoErrorList').html("");
-                       $('#todoErrorList').addClass("alert alert-danger d-none");
-                       $('#todoErrorList').removeClass("d-none");
-                       $.each(res.errors , function(key,err_value){
-                           $('#todoErrorList').append('<li>'+err_value+'</li>');
-                       });
-                   }else if(res.status == 200){
-                       $('.loader').hide();
+                       $('#titleErrors').html("");
+                       $('#imageErrors').html("");
+                       $('#descriptionErrors').html("");
                        $('#AddTodo').find('input').val('');
                        $('#AddTodo').find('textarea').val('');
-                       $('#todoErrorList').hide("alert alert-danger d-none");
                        $('#CreateTodo').modal('hide');
-                       routeToTodo();
+                        fetchTodo();
                        toastr.success(res.message);
-                   }
+               },
+               error: function(res){
+                $('.loader').hide();
+                var formErrors = res.responseJSON.errors;
+                    if(formErrors.hasOwnProperty('title')){
+                        str = formErrors.title[0];
+                        $('#titleErrors').html(str);
+                    }
+                    if(formErrors.hasOwnProperty('image')){
+                        str = formErrors.image[0];
+                        $('#imageErrors').html(str);
+                    }
+                    if(formErrors.hasOwnProperty('description')){
+                        str = formErrors.description[0];
+                        $('#descriptionErrors').html(str);
+                    }
                }
-          })
-       });
+          });
        $(document).on('click' , '.edit_todo_btn' , function(e){
           e.preventDefault();
            var todo_id = $(this).val();
@@ -264,10 +272,11 @@
                        $('.Edit_loader'+todo_id+'').hide();
                        $('#edit_todo_title').val(res.todo.title);
                       $('#edit_todo_description').val(res.todo.description);
-                      $('#edit_todo_image').html("<img src='upload/todo/"+res.todo.image+"' width='100' class='mt-3 img-thumbnail' alt="+res.todo.image+">");
+                      $('#edit_todo_image').html(""+res.todo.image+"" != 0 ? "<img class='img-thumbnail' src='storage/upload/todo/"+res.todo.image+"' width='100px' alt="+res.todo.image+">" : "<img class='img-thumbnail' src='assets/img/no-image-icon-6.png' width='50px' alt='no-image-icon-6.png'>");
                        $('#todo_id').val(todo_id);
                    }
-               }
+               },
+
            })
        });
        $(document).on('submit' , '#EditTodo' , function(e){
@@ -284,25 +293,37 @@
                    $('.loader').show();
                },
                success: function(res){
-                   if(res.status == 400){
+                if(res.status == 200){
                        $('.loader').hide();
-                       $('#EdittodoErrorList').html("");
-                      $('#EdittodoErrorList').addClass("alert alert-danger d-none");
-                      $('#EdittodoErrorList').removeClass("d-none");
-                      $.each(res.errors , function(key,err_value) {
-                          $('#EdittodoErrorList').append('<li>'+err_value+'</li>');
-                      });
-                   }else if(res.status == 200){
-                       $('.loader').hide();
+                       $('#EditTitleErrors').html("");
+                       $('#EditimageErrors').html("");
+                       $('#EditdescriptionErrors').html("");
+                       $('#EditTodo').find('input').val('');
+                       $('#EditTodo').find('textarea').val('');
                        toastr.success(res.message);
                        $('#EditTodoModal').modal('hide');
-                       $('#EdittodoErrorList').hide("alert alert-danger d-none");
-                       routeToTodo();
+                        fetchTodo();
                    }else if(res.status == 404){
                        $('#EditTodoModal').modal('hide');
                        $('.loader').hide();
                        toastr.error(res.message);
                    }
+               },
+               error: function(res){
+                $('.loader').hide();
+                var formErrors = res.responseJSON.errors;
+                    if(formErrors.hasOwnProperty('title')){
+                        str = formErrors.title[0];
+                        $('#EditTitleErrors').html(str);
+                    }
+                    if(formErrors.hasOwnProperty('image')){
+                        str = formErrors.image[0];
+                        $('#EditimageErrors').html(str);
+                    }
+                    if(formErrors.hasOwnProperty('description')){
+                        str = formErrors.description[0];
+                        $('#EditdescriptionErrors').html(str);
+                    }
                }
            })
        });
@@ -331,19 +352,21 @@
                        $('.loader').hide();
                        $('#DeleteTodo').modal('hide');
                        toastr.success(res.message);
-                       routeToTodo();
+                        fetchTodo();
                    }
                }
            })
        });
+    })
    })
 
 
 
    function TaskDone(elm,id){
+
            $.ajax({
                type: 'POST',
-               url: 'task/completed/'+id,
+               url: 'todo/task/completed/'+id,
                data: {
                    '_token' : "{{csrf_token()}}",
                },
@@ -354,13 +377,19 @@
                    if(res.status == 404){
                        $('.task_loader'+id+'').hide();
                        toastr.error(res.message);
-                   }else{
-                       $('.task_loader'+id+'').hide();
-                       routeToTodo();
-                       toastr.success(res.message);
-                   }
-               }
-           });
-       }
-</script>
+                    }else{
+                       $('.markAsComplete'+id+'').html("<button style='border: none; margin-right: 4px;' id='completed' class='badge bg-success'>Completed</button>");
+                        $('.task_loader'+id+'').hide();
+                        toastr.success(res.message);
+                    }
+                }
+            });
+        }
+
+
+
+    </script>
+
+
+
 @endpush
