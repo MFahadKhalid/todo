@@ -16,7 +16,7 @@
       <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#CreateTodo">Create Task</button>
    </div>
    <div>
-      <table class="table table-striped mt-5" id="datatable">
+      <table class="table table-striped mt-5">
          <thead>
             <tr>
                 <th>#</th>
@@ -27,7 +27,7 @@
                <th>Action</th>
             </tr>
          </thead>
-         <tbody class="PrintTodo">
+         <tbody id="PrintTodo">
             <tr class="todoLoader" style="display: none;">
                 <td class="text-center" colspan="6">
                     <div class="spinner-border" role="status">
@@ -139,7 +139,9 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
+
             <input type="hidden" id="delete_todo_id">
+
             <div>
                <h5>Are you sure you want to delete this data?</h5>
             </div>
@@ -163,29 +165,21 @@
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
 <script>
-
-
    $(document).ready(function (){
-       $.ajaxSetup({
-           headers: {
-              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-          }
-       });
-       fetchTodo();
-       function fetchTodo(){
-
-            $.ajax({
-                type: "GET",
-                url: "{{ route('todo.fetch') }}",
-                dataType: 'json',
-                beforeSend: function(res){
-                    $('.todoLoader').show();
-                },
-                success: function(res){
-                    $('.todoLoader').hide();
-                    $('.PrintTodo').html("");
-                    $.each(res.todo , function(key,item){
-                        var append = "<tr class='post'>"+
+    fetchTodo();
+    function fetchTodo(){
+        $.ajax({
+            type: "GET",
+            url: "{{ route('todo.fetch') }}",
+            dataType: 'json',
+            beforeSend: function(res){
+                $('.todoLoader').show();
+            },
+            success: function(res){
+                $('.todoLoader').hide();
+                $('#PrintTodo').html("");
+                $.each(res.todo , function(key,item){
+                    $('#PrintTodo').append("<tr>"+
                             "<td>"+ ++key +"</td>"+
                             "<td>"+item.title+"</td>"+
                             "<td>"+
@@ -207,12 +201,19 @@
                             "</div>"+
                             "Delete"+
                             "</button>"+
-                            "</td>";
-                        $(".PrintTodo").append(append);
-                    });
-                }
-               });
+                            "</td>");
+                });
             }
+        })
+    }
+       $.ajaxSetup({
+           headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          }
+       });
+
+
+
                $(document).on('submit' ,'#AddTodo', function(e){
           e.preventDefault();
           let formData = new FormData($('#AddTodo')[0]);
@@ -252,6 +253,7 @@
                         $('#descriptionErrors').html(str);
                     }
                }
+          });
           });
        $(document).on('click' , '.edit_todo_btn' , function(e){
           e.preventDefault();
@@ -329,6 +331,7 @@
        });
        $(document).on('click' , '.delete_todo_btn' , function (e){
           e.preventDefault();
+
            var todo_id = $(this).val();
            $('#DeleteTodo').modal('show');
            $('#delete_todo_id').val(todo_id);
@@ -358,7 +361,6 @@
            })
        });
     })
-   })
 
 
 

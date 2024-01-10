@@ -24,9 +24,8 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $title = 'Home';
-        $totalrecords = Todo::where('user_id' , auth()->user()->id)->select('*')->count();
-        $todos = Todo::where('user_id' , auth()->user()->id)->get();
-        return view('pages.index' , compact( 'title' , 'totalrecords' , 'todos'));
+        $data['title'] = 'Home';
+        $data['todos'] = Todo::where('user_id' , auth()->user()->id)->orderBy('id' , 'DESC')->get();
+        return view('pages.index' , $data);
     }
 }
