@@ -56,20 +56,19 @@ class TodoController extends Controller
                 $todo->user_id = auth()->user()->id;
                 $todo->title = $request->input('title');
                 $todo->description = $request->input('description');
-                $imageData = Todo::where('id',$id)->firstorfail();
-                $path = 'storage/upload/todo/'.$todo->image;
-                if(File::exists($path)){
-                    File::delete($path);
-                }
-                if($request->file('image')){
+
+                if ($request->hasFile('image')) {
+                    $imageData = Todo::where('id',$id)->firstorfail();
+                    $path = 'storage/upload/todo/'.$imageData->image;
+                    if(File::exists($path)){
+                        File::delete($path);
+                    }
                     $image = $request->file('image');
                     $imageName = 'todo' . '-' . time() . '.' . $image->getClientOriginalExtension();
                     $image->move('storage/upload/todo',$imageName);
                     $todo->image = $imageName;
                 }
-                else{
-                    $imageName = $imageData->image;
-                }
+
                 $todo->update();
                 return response()->json(['status' => 200 , 'message' => 'Task updated']);
             }else{
