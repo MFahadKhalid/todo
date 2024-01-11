@@ -234,19 +234,21 @@
                         "</button>"+
                         "</td>");
             });
+
+
             let prevPage = res.prev_page_url ? `<li class="page-item"><a class="page-link" href="javascript:;" data-page="${page - 1}">Previous</a></li>` : '';
             let nextPage = res.next_page_url ? `<li class="page-item"><a class="page-link" href="javascript:;" data-page="${page + 1}">Next</a></li>` : '';
             let pagination = `<ul class="pagination">${prevPage}${nextPage}</ul>`;
             $('#paginate').after(pagination);
-            $(document).on('click', '.page-link', function(e) {
-                e.preventDefault();
-                let page = $(this).data('page');
-                fetchTodo(page);
-            });
-
         }
     })
-   }
+}
+
+$(document).on('click', '.page-link', function(e) {
+    e.preventDefault();
+    let page = $(this).data('page');
+    fetchTodo(page);
+});
 
        $.ajaxSetup({
            headers: {
