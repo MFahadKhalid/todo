@@ -8,6 +8,10 @@
    height: 20px;
    width: 20px;
    }
+   .viewImage{
+    height: 178px;
+    width: 300px;
+   }
 </style>
 @endpush
 @section('content')
@@ -27,15 +31,16 @@
             </tr>
          </thead>
          <tbody id="PrintTodo">
-            <tr class="todoLoader" style="display: none;">
-               <td class="text-center" colspan="6">
-                  <div class="spinner-border" role="status">
-                     <span class="sr-only">Loading...</span>
-                  </div>
-               </td>
-            </tr>
+
          </tbody>
       </table>
+<div class="row">
+    <div class="col-md-12" style="text-align: center;">
+        <div style="display: none;" class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+         </div>
+    </div>
+</div>
       <div id="paginate"></div>
    </div>
 </div>
@@ -94,7 +99,6 @@
          <div class="modal-body">
             <ul id="EdittodoErrorList"></ul>
             <form method="POST" id="EditTodo">
-               <input type="hidden" name="todo_id" id="todo_id">
                <div class="todoModal">
                   <div class="row">
                      <div class="col-md-12 mb-3">
@@ -130,51 +134,41 @@
    </div>
 </div>
 {{-- View Todo --}}
-<div class="modal fade" id="EditTodoModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
-      <div class="modal-content">
-         <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">View Task</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-         </div>
-         <div class="modal-body">
-            <ul id="EdittodoErrorList"></ul>
-            <form method="POST" id="ViewTodo">
-               <input type="hidden" name="view_todo_id" id="view_todo_id">
-               <div class="todoModal">
-                  <div class="row">
-                     <div class="col-md-12 mb-3">
-                        <label for="">Title <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control view_todo_title" name="title" id="view_todo_title">
-                        <small class="text-danger" id="EditTitleErrors"></small>
-                     </div>
-                     <div class="col-md-12 mb-3">
-                        <label for="">Image </label>
-                        <input type="file" name="image" class="form-control todo_image" id="image">
-                        <span id="view_todo_image"></span>
-                        <small class="text-danger" id="EditimageErrors"></small>
-                     </div>
-                     <div class="col-md-12 mb-3">
-                        <label for="">Description </label>
-                        <textarea name="description" class="form-control" id="view_todo_description" cols="15" rows="5"></textarea>
-                        <small class="text-danger" id="EditdescriptionErrors"></small>
-                     </div>
-                  </div>
-               </div>
-               <div style="float: right;">
-                  <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="submit" class="btn btn-warning text-light me-sm-3 me-1">
-                     <div style="display: none;" class="loader spinner-border" role="status">
-                        <span class="sr-only">Loading...</span>
-                     </div>
-                     Update
-                  </button>
-               </div>
-            </form>
-         </div>
-      </div>
-   </div>
-</div>
+<div class="modal fade" id="ViewTodoModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+       <div class="modal-content">
+          <div class="modal-header">
+             <h5 class="modal-title" id="exampleModalLabel">View Task</h5>
+             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+             <form method="POST" id="viewTodo">
+                <div class="todoModal">
+                   <div class="row">
+                      <div class="col-md-12 mb-3">
+                         <b>Title:-</b>
+                         <small id="view_todo_title"></small>
+                      </div>
+                      <div class="col-md-12 mb-3">
+                         <b for="">Description:- </b>
+                        <small id="view_todo_description"></small>
+                      </div>
+                      <div class="col-md-12 mb-3">
+                         <b for="">Image:- </b><br>
+                         <div id="view_todo_image"></div>
+                      </div>
+                   </div>
+                </div>
+             </form>
+          </div>
+          <div class="modal-footer">
+            <div style="float: right;">
+                <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+             </div>
+          </div>
+       </div>
+    </div>
+ </div>
 {{-- Delete Todo --}}
 <div class="modal fade" id="DeleteTodo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
    <div class="modal-dialog">
@@ -184,22 +178,21 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
-            <input type="hidden" id="delete_todo_id">
             <div>
                <h5>Are you sure you want to delete this data?</h5>
             </div>
          </div>
          <div class="modal-footer">
-            <div class="" style="float: right;">
-               <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-               <button type="submit" class="btn btn-danger me-sm-3 me-1 delete_todo">
-                  <div style="display: none;" class="loader spinner-border" role="status">
-                     <span class="sr-only">Loading...</span>
-                  </div>
-                  Delete
-               </button>
+            <div class="">
+              <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-danger me-sm-3 me-1 delete_todo">
+                <div style="display: none;" class="loader spinner-border" role="status">
+                  <span class="sr-only">Loading...</span>
+                </div>
+                Delete
+              </button>
             </div>
-         </div>
+          </div>
       </div>
    </div>
 </div>
@@ -210,31 +203,42 @@
    $(document).ready(function (){
     fetchTodo();
 
+
     function fetchTodo(page = 1) {
     $.ajax({
         type: "GET",
         url: "{{ route('todo.fetch') }}?page=" + page,
         dataType: 'json',
+        beforeSend: function(res){
+            $('.spinner-border').show();
+        },
         success: function(res){
+            $('.spinner-border').hide();
             $('.pagination').remove("");
-            $('#PrintTodo').empty(); // Empty the table body instead of using html("")
+            $('#PrintTodo').html("");
             $.each(res.data , function(key,item){
                 $('#PrintTodo').append("<tr>"+
-                        "<td>"+item.title+"</td>"+
+                        "<td>"+item.title.substr(0, 10)+"...</td>"+
                         "<td>"+
                         (""+item.image+"" != 0 ? "<img class='img-thumbnail' src='storage/upload/todo/"+item.image+"' width='100px' alt="+item.image+">" : "<img class='img-thumbnail' src='assets/img/no-image-icon-6.png' width='50px' alt='no-image-icon-6.png'>")+
                         "</td>"+
-                        "<td>"+item.description+"</td>"+
+                        "<td>"+item.description.substr(0, 20)+"...</td>"+
                         "<td>"+
                         (""+item.status+"" == 1 ? "<button style='border: none; margin-right: 4px;' id='completed' class='badge bg-success'>Completed</button>" : "<div class='markAsComplete"+item.id+"'><button style='border: none; margin-right: 4px;' class='badge bg-default'><div style='display: none; height: 14px; width: 13px;' class='task_loader"+item.id+" spinner-border text-success' role='status'><span class='sr-only'>Loading...</span></div><a id='' class='text-dark' style='text-decoration: none;' onClick='TaskDone($(this),"+item.id+")' href='javascript:;'>Mark as Completed</a></button></div>")+
                         "</td>"+
-                        "<td><button style='border: none; margin-right: 4px;' value="+item.id+" class='edit_todo_btn badge bg-warning'>"+
+                        "<td>"+
+                            "<button style='border: none; margin-right: 4px;' data-todo-id="+item.id+" class='view_todo_btn badge bg-info'>"+
+                        "<div style='display: none; height: 14px; width: 13px;' class='View_loader"+item.id+" spinner-border' role='status'>"+
+                        "<span class='sr-only'>Loading...</span>"+
+                        "</div>"+
+                        "View"+
+                            "<button style='border: none; margin-right: 4px;' data-todo-id="+item.id+" class='edit_todo_btn badge bg-warning'>"+
                         "<div style='display: none; height: 14px; width: 13px;' class='Edit_loader"+item.id+" spinner-border' role='status'>"+
                         "<span class='sr-only'>Loading...</span>"+
                         "</div>"+
                         "Edit"+
                         "</button>"+
-                        "<button style='border: none; margin-right: 4px;' value="+item.id+" class='delete_todo_btn badge bg-danger'>"+
+                        "<button style='border: none; margin-right: 4px;' data-todo-id="+item.id+" class='delete_todo_btn badge bg-danger'>"+
                         "<div style='display: none; height: 14px; width: 13px;' class='delete_loader"+item.id+" spinner-border' role='status'>"+
                         "<span class='sr-only'>Loading...</span>"+
                         "</div>"+
@@ -250,6 +254,7 @@
             $(document).on('click', '.page-link', function(e) {
                 e.preventDefault();
                 let page = $(this).data('page');
+                $('#PrintTodo').html("");
                 fetchTodo(page);
             });
         }
@@ -305,27 +310,51 @@
                }
           });
           });
-       $(document).on('click' , '.edit_todo_btn' , function(e){
+          $(document).on('click' , '.view_todo_btn' , function(e){
           e.preventDefault();
-           var todo_id = $(this).val();
-           $('#EditTodoModal').modal('show');
+          var todoId = $(this).data('todoId');
+            $('#ViewTodoModal').data('todo-id', todoId).modal('show');
            $.ajax({
                type: "GET",
-               url: "todo/edit/"+todo_id,
+               url: "todo/view/"+todoId,
                beforeSend : function(response){
-                   $('.Edit_loader'+todo_id+'').show();
+                   $('.View_loader'+todoId+'').show();
                },
                success:function (res){
                    if(res.status == 404){
-                       $('.Edit_loader'+todo_id+'').hide();
+                       $('.View_loader'+todoId+'').hide();
+                       toastr.error(res.message);
+                       $('#ViewTodoModal').modal('hide');
+                   }else{
+                       $('.View_loader'+todoId+'').hide();
+                       $('#view_todo_title').html(res.todo.title);
+                      $('#view_todo_description').html(res.todo.description);
+                      $('#view_todo_image').html(""+res.todo.image+"" != 0 ? "<a href='storage/upload/todo/"+res.todo.image+"' target='_blank'><img class='viewImage img-thumbnail' src='storage/upload/todo/"+res.todo.image+"' width='100px' alt="+res.todo.image+">" : "<img class='img-thumbnail' src='assets/img/no-image-icon-6.png' width='50px' alt='no-image-icon-6.png'></a>");
+                   }
+               },
+
+           })
+       });
+       $(document).on('click' , '.edit_todo_btn' , function(e){
+          e.preventDefault();
+          var todoId = $(this).data('todoId');
+            $('#EditTodoModal').data('todo-id', todoId).modal('show');
+           $.ajax({
+               type: "GET",
+               url: "todo/edit/"+todoId,
+               beforeSend : function(response){
+                   $('.Edit_loader'+todoId+'').show();
+               },
+               success:function (res){
+                   if(res.status == 404){
+                       $('.Edit_loader'+todoId+'').hide();
                        toastr.error(res.message);
                        $('#EditTodoModal').modal('hide');
                    }else{
-                       $('.Edit_loader'+todo_id+'').hide();
+                       $('.Edit_loader'+todoId+'').hide();
                        $('#edit_todo_title').val(res.todo.title);
                       $('#edit_todo_description').val(res.todo.description);
                       $('#edit_todo_image').html(""+res.todo.image+"" != 0 ? "<img class='img-thumbnail' src='storage/upload/todo/"+res.todo.image+"' width='100px' alt="+res.todo.image+">" : "<img class='img-thumbnail' src='assets/img/no-image-icon-6.png' width='50px' alt='no-image-icon-6.png'>");
-                       $('#todo_id').val(todo_id);
                    }
                },
 
@@ -333,11 +362,12 @@
        });
        $(document).on('submit' , '#EditTodo' , function(e){
           e.preventDefault();
-           var todo_id = $('#todo_id').val();
+  var todoId = $('#EditTodoModal').data('todo-id');
+
            let EditformData = new FormData($('#EditTodo')[0]);
            $.ajax({
                type: "POST",
-               url: "todo/update/"+todo_id,
+               url: "todo/update/"+todoId,
                data: EditformData,
                contentType: false,
                processData: false,
@@ -379,37 +409,35 @@
                }
            })
        });
-       $(document).on('click' , '.delete_todo_btn' , function (e){
-          e.preventDefault();
-
-           var todo_id = $(this).val();
-           $('#DeleteTodo').modal('show');
-           $('#delete_todo_id').val(todo_id);
-       });
-       $(document).on('click' , '.delete_todo' , function (e){
-          e.preventDefault();
-          var id = $('#delete_todo_id').val();
-           $.ajax({
-               type: "DELETE",
-               url: "todo/delete/"+id,
-               dataType: 'json',
-               beforeSend : function(res){
-                   $('.loader').show();
-               },
-               success: function(res){
-                   if(res.status == 404){
-                       $('.loader').hide();
-                       toastr.error('404 not found');
-                       $('#DeleteTodo').modal('hide');
-                   }else if(res.status == 200){
-                       $('.loader').hide();
-                       $('#DeleteTodo').modal('hide');
-                       toastr.success(res.message);
-                        fetchTodo();
-                   }
-               }
-           })
-       });
+       $(document).on('click', '.delete_todo_btn', function(e) {
+  e.preventDefault();
+  var todoId = $(this).data('todoId');
+  $('#DeleteTodo').data('todo-id', todoId).modal('show');
+});
+$(document).on('click', '.delete_todo', function(e) {
+  e.preventDefault();
+  var todoId = $('#DeleteTodo').data('todo-id');
+  $.ajax({
+    type: "DELETE",
+    url: "todo/delete/" + todoId,
+    dataType: 'json',
+    beforeSend: function(res) {
+      $('.loader').show();
+    },
+    success: function(res) {
+      if (res.status == 404) {
+        $('.loader').hide();
+        toastr.error('404 not found');
+        $('#DeleteTodo').modal('hide');
+      } else if (res.status == 200) {
+        $('.loader').hide();
+        $('#DeleteTodo').modal('hide');
+        toastr.success(res.message);
+        fetchTodo();
+      }
+    }
+  })
+});
     })
 
 
