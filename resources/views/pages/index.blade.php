@@ -9,6 +9,7 @@
    width: 20px;
    }
 </style>
+
 @endpush
 @section('content')
 <div class="mt-5 container">
@@ -19,7 +20,6 @@
       <table class="table table-striped mt-5">
          <thead>
             <tr>
-                <th>#</th>
                 <th>Title</th>
                <th>Image</th>
                <th>Description</th>
@@ -37,6 +37,7 @@
             </tr>
          </tbody>
       </table>
+    <div id="paginate"></div>
    </div>
 </div>
 {{-- Create Todo --}}
@@ -130,6 +131,52 @@
       </div>
    </div>
 </div>
+{{-- View Todo --}}
+<div class="modal fade" id="EditTodoModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+       <div class="modal-content">
+          <div class="modal-header">
+             <h5 class="modal-title" id="exampleModalLabel">View Task</h5>
+             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+             <ul id="EdittodoErrorList"></ul>
+             <form method="POST" id="ViewTodo">
+                <input type="hidden" name="view_todo_id" id="view_todo_id">
+                <div class="todoModal">
+                   <div class="row">
+                      <div class="col-md-12 mb-3">
+                         <label for="">Title <span class="text-danger">*</span></label>
+                         <input type="text" class="form-control view_todo_title" name="title" id="view_todo_title">
+                         <small class="text-danger" id="EditTitleErrors"></small>
+                      </div>
+                      <div class="col-md-12 mb-3">
+                         <label for="">Image </label>
+                         <input type="file" name="image" class="form-control todo_image" id="image">
+                         <span id="view_todo_image"></span>
+                         <small class="text-danger" id="EditimageErrors"></small>
+                      </div>
+                      <div class="col-md-12 mb-3">
+                         <label for="">Description </label>
+                         <textarea name="description" class="form-control" id="view_todo_description" cols="15" rows="5"></textarea>
+                         <small class="text-danger" id="EditdescriptionErrors"></small>
+                      </div>
+                   </div>
+                </div>
+                <div style="float: right;">
+                   <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                   <button type="submit" class="btn btn-warning text-light me-sm-3 me-1">
+                      <div style="display: none;" class="loader spinner-border" role="status">
+                         <span class="sr-only">Loading...</span>
+                      </div>
+                      Update
+                   </button>
+                </div>
+             </form>
+          </div>
+       </div>
+    </div>
+ </div>
 {{-- Delete Todo --}}
 <div class="modal fade" id="DeleteTodo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
    <div class="modal-dialog">
@@ -162,50 +209,57 @@
 </div>
 @endsection
 @push('scripts')
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
    $(document).ready(function (){
     fetchTodo();
-    function fetchTodo(){
-        $.ajax({
-            type: "GET",
-            url: "{{ route('todo.fetch') }}",
-            dataType: 'json',
-            beforeSend: function(res){
-                $('.todoLoader').show();
-            },
-            success: function(res){
-                $('.todoLoader').hide();
-                $('#PrintTodo').html("");
-                $.each(res.todo , function(key,item){
-                    $('#PrintTodo').append("<tr>"+
-                            "<td>"+ ++key +"</td>"+
-                            "<td>"+item.title+"</td>"+
-                            "<td>"+
-                            (""+item.image+"" != 0 ? "<img class='img-thumbnail' src='storage/upload/todo/"+item.image+"' width='100px' alt="+item.image+">" : "<img class='img-thumbnail' src='assets/img/no-image-icon-6.png' width='50px' alt='no-image-icon-6.png'>")+
-                            "</td>"+
-                            "<td>"+item.description+"</td>"+
-                            "<td>"+
-                            (""+item.status+"" == 1 ? "<button style='border: none; margin-right: 4px;' id='completed' class='badge bg-success'>Completed</button>" : "<div class='markAsComplete"+item.id+"'><button style='border: none; margin-right: 4px;' class='badge bg-default'><div style='display: none; height: 14px; width: 13px;' class='task_loader"+item.id+" spinner-border text-success' role='status'><span class='sr-only'>Loading...</span></div><a id='' class='text-dark' style='text-decoration: none;' onClick='TaskDone($(this),"+item.id+")' href='javascript:;'>Mark as Completed</a></button></div>")+
-                            "</td>"+
-                            "<td><button style='border: none; margin-right: 4px;' value="+item.id+" class='edit_todo_btn badge bg-warning'>"+
-                            "<div style='display: none; height: 14px; width: 13px;' class='Edit_loader"+item.id+" spinner-border' role='status'>"+
-                            "<span class='sr-only'>Loading...</span>"+
-                            "</div>"+
-                            "Edit"+
-                            "</button>"+
-                            "<button style='border: none; margin-right: 4px;' value="+item.id+" class='delete_todo_btn badge bg-danger'>"+
-                            "<div style='display: none; height: 14px; width: 13px;' class='delete_loader"+item.id+" spinner-border' role='status'>"+
-                            "<span class='sr-only'>Loading...</span>"+
-                            "</div>"+
-                            "Delete"+
-                            "</button>"+
-                            "</td>");
-                });
-            }
-        })
-    }
+
+    function fetchTodo(page = 1) {
+    $.ajax({
+        type: "GET",
+        url: "{{ route('todo.fetch') }}?page=" + page,
+        dataType: 'json',
+        success: function(res){
+            $('.pagination').remove("");
+            $('#PrintTodo').empty(); // Empty the table body instead of using html("")
+            $.each(res.data , function(key,item){
+                $('#PrintTodo').append("<tr>"+
+                        "<td>"+item.title+"</td>"+
+                        "<td>"+
+                        (""+item.image+"" != 0 ? "<img class='img-thumbnail' src='storage/upload/todo/"+item.image+"' width='100px' alt="+item.image+">" : "<img class='img-thumbnail' src='assets/img/no-image-icon-6.png' width='50px' alt='no-image-icon-6.png'>")+
+                        "</td>"+
+                        "<td>"+item.description+"</td>"+
+                        "<td>"+
+                        (""+item.status+"" == 1 ? "<button style='border: none; margin-right: 4px;' id='completed' class='badge bg-success'>Completed</button>" : "<div class='markAsComplete"+item.id+"'><button style='border: none; margin-right: 4px;' class='badge bg-default'><div style='display: none; height: 14px; width: 13px;' class='task_loader"+item.id+" spinner-border text-success' role='status'><span class='sr-only'>Loading...</span></div><a id='' class='text-dark' style='text-decoration: none;' onClick='TaskDone($(this),"+item.id+")' href='javascript:;'>Mark as Completed</a></button></div>")+
+                        "</td>"+
+                        "<td><button style='border: none; margin-right: 4px;' value="+item.id+" class='edit_todo_btn badge bg-warning'>"+
+                        "<div style='display: none; height: 14px; width: 13px;' class='Edit_loader"+item.id+" spinner-border' role='status'>"+
+                        "<span class='sr-only'>Loading...</span>"+
+                        "</div>"+
+                        "Edit"+
+                        "</button>"+
+                        "<button style='border: none; margin-right: 4px;' value="+item.id+" class='delete_todo_btn badge bg-danger'>"+
+                        "<div style='display: none; height: 14px; width: 13px;' class='delete_loader"+item.id+" spinner-border' role='status'>"+
+                        "<span class='sr-only'>Loading...</span>"+
+                        "</div>"+
+                        "Delete"+
+                        "</button>"+
+                        "</td>");
+            });
+
+            let prevPage = res.prev_page_url ? `<li class="page-item"><a class="page-link" href="javascript:;" data-page="${page - 1}">Previous</a></li>` : '';
+            let nextPage = res.next_page_url ? `<li class="page-item"><a class="page-link" href="javascript:;" data-page="${page + 1}">Next</a></li>` : '';
+            let pagination = `<ul class="pagination">${prevPage}${nextPage}</ul>`;
+            $('#paginate').after(pagination);
+            $(document).on('click', '.page-link', function(e) {
+                e.preventDefault();
+                let page = $(this).data('page');
+                fetchTodo(page);
+            });
+        }
+    })
+}
+
        $.ajaxSetup({
            headers: {
               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

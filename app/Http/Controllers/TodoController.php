@@ -4,16 +4,18 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Todo;
-use Illuminate\Support\Facades\Crypt;
 use DataTables;
 use Validator;
 use File;
 
 class TodoController extends Controller
 {
-    public function fetch(){
-        $todo = Todo::where('user_id' , auth()->user()->id)->orderBy('id' , 'DESC')->get();
-        return response()->json(['todo' => $todo]);
+    public function fetch(Request $request)
+    {
+        $todos = Todo::where('user_id', auth()->user()->id)
+            ->orderBy('id', 'desc')
+            ->paginate(5);
+        return response()->json($todos);
     }
     public function store(Request $request){
         $validator = $request->validate([
@@ -34,6 +36,14 @@ class TodoController extends Controller
             }
             $todo->save();
             return response()->json(['status' => 200 , 'message' => 'Task created']);
+        }
+    }
+    public function view($id){
+        $todos = Todo::find($id);
+        if($todos){
+            return response()->json(['status' == 200 , 'todo' => $todos]);
+        }else{
+            return response()->json(['status' == 404 , 'todo' => '404 not found']);
         }
     }
     public function edit($id){
