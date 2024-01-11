@@ -20,7 +20,7 @@ class TodoController extends Controller
     public function store(Request $request){
         $validator = $request->validate([
             'title' => 'required|max:255',
-            'image' => 'image',
+            'image' => 'image|mimes:png,jpg,jpeg',
             'description' => 'max:8000',
         ]);
         if(auth()->user()->id){

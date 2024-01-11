@@ -224,29 +224,20 @@
                         "</td>"+
                         "<td>"+item.description.substr(0, 20)+"...</td>"+
                         "<td>"+
-                        (""+item.status+"" == 1 ? "<button style='border: none; margin-right: 4px;' id='completed' class='badge bg-success'>Completed</button>" : "<div class='markAsComplete"+item.id+"'><button style='border: none; margin-right: 4px;' class='badge bg-default'><div style='display: none; height: 14px; width: 13px;' class='task_loader"+item.id+" spinner-border text-success' role='status'><span class='sr-only'>Loading...</span></div><a id='' class='text-dark' style='text-decoration: none;' onClick='TaskDone($(this),"+item.id+")' href='javascript:;'>Mark as Completed</a></button></div>")+
+                        (""+item.status+"" == 1 ? "<button style='border: none; margin-right: 4px;' id='completed' class='badge bg-success'>Completed</button>" : "<div class='markAsComplete"+item.id+"'><button style='border: none; margin-right: 4px;' class='badge bg-default'><a id='' class='text-dark' style='text-decoration: none;' onClick='TaskDone($(this),"+item.id+")' href='javascript:;'>Mark as Completed</a></button></div>")+
                         "</td>"+
                         "<td>"+
                             "<button style='border: none; margin-right: 4px;' data-todo-id="+item.id+" class='view_todo_btn badge bg-info'>"+
-                        "<div style='display: none; height: 14px; width: 13px;' class='View_loader"+item.id+" spinner-border' role='status'>"+
-                        "<span class='sr-only'>Loading...</span>"+
-                        "</div>"+
                         "View"+
+                        "</button>"+
                             "<button style='border: none; margin-right: 4px;' data-todo-id="+item.id+" class='edit_todo_btn badge bg-warning'>"+
-                        "<div style='display: none; height: 14px; width: 13px;' class='Edit_loader"+item.id+" spinner-border' role='status'>"+
-                        "<span class='sr-only'>Loading...</span>"+
-                        "</div>"+
                         "Edit"+
                         "</button>"+
                         "<button style='border: none; margin-right: 4px;' data-todo-id="+item.id+" class='delete_todo_btn badge bg-danger'>"+
-                        "<div style='display: none; height: 14px; width: 13px;' class='delete_loader"+item.id+" spinner-border' role='status'>"+
-                        "<span class='sr-only'>Loading...</span>"+
-                        "</div>"+
                         "Delete"+
                         "</button>"+
                         "</td>");
             });
-
             let prevPage = res.prev_page_url ? `<li class="page-item"><a class="page-link" href="javascript:;" data-page="${page - 1}">Previous</a></li>` : '';
             let nextPage = res.next_page_url ? `<li class="page-item"><a class="page-link" href="javascript:;" data-page="${page + 1}">Next</a></li>` : '';
             let pagination = `<ul class="pagination">${prevPage}${nextPage}</ul>`;
@@ -257,6 +248,7 @@
                 $('#PrintTodo').html("");
                 fetchTodo(page);
             });
+
         }
     })
    }
@@ -278,7 +270,7 @@
                data: formData,
                contentType: false,
                processData: false,
-               beforeSend : function(response){
+               beforeSend : function(res){
                    $('.loader').show();
                },
                success: function(res){
@@ -317,16 +309,11 @@
            $.ajax({
                type: "GET",
                url: "todo/view/"+todoId,
-               beforeSend : function(response){
-                   $('.View_loader'+todoId+'').show();
-               },
                success:function (res){
                    if(res.status == 404){
-                       $('.View_loader'+todoId+'').hide();
                        toastr.error(res.message);
                        $('#ViewTodoModal').modal('hide');
                    }else{
-                       $('.View_loader'+todoId+'').hide();
                        $('#view_todo_title').html(res.todo.title);
                       $('#view_todo_description').html(res.todo.description);
                       $('#view_todo_image').html(""+res.todo.image+"" != 0 ? "<a href='storage/upload/todo/"+res.todo.image+"' target='_blank'><img class='viewImage img-thumbnail' src='storage/upload/todo/"+res.todo.image+"' width='100px' alt="+res.todo.image+">" : "<img class='img-thumbnail' src='assets/img/no-image-icon-6.png' width='50px' alt='no-image-icon-6.png'></a>");
@@ -342,16 +329,11 @@
            $.ajax({
                type: "GET",
                url: "todo/edit/"+todoId,
-               beforeSend : function(response){
-                   $('.Edit_loader'+todoId+'').show();
-               },
                success:function (res){
                    if(res.status == 404){
-                       $('.Edit_loader'+todoId+'').hide();
                        toastr.error(res.message);
                        $('#EditTodoModal').modal('hide');
                    }else{
-                       $('.Edit_loader'+todoId+'').hide();
                        $('#edit_todo_title').val(res.todo.title);
                       $('#edit_todo_description').val(res.todo.description);
                       $('#edit_todo_image').html(""+res.todo.image+"" != 0 ? "<img class='img-thumbnail' src='storage/upload/todo/"+res.todo.image+"' width='100px' alt="+res.todo.image+">" : "<img class='img-thumbnail' src='assets/img/no-image-icon-6.png' width='50px' alt='no-image-icon-6.png'>");
@@ -450,16 +432,11 @@ $(document).on('click', '.delete_todo', function(e) {
                data: {
                    '_token' : "{{csrf_token()}}",
                },
-               beforeSend : function(res){
-                   $('.task_loader'+id+'').show();
-               },
                success: function(res){
                    if(res.status == 404){
-                       $('.task_loader'+id+'').hide();
                        toastr.error(res.message);
                     }else{
                        $('.markAsComplete'+id+'').html("<button style='border: none; margin-right: 4px;' id='completed' class='badge bg-success'>Completed</button>");
-                        $('.task_loader'+id+'').hide();
                         toastr.success(res.message);
                     }
                 }
