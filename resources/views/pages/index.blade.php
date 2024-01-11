@@ -209,11 +209,7 @@
         type: "GET",
         url: "{{ route('todo.fetch') }}?page=" + page,
         dataType: 'json',
-        beforeSend: function(res){
-            $('.spinner-border').show();
-        },
         success: function(res){
-            $('.spinner-border').hide();
             $('.pagination').remove("");
             $('#PrintTodo').html("");
             $.each(res.data , function(key,item){
@@ -245,7 +241,6 @@
             $(document).on('click', '.page-link', function(e) {
                 e.preventDefault();
                 let page = $(this).data('page');
-                $('#PrintTodo').html("");
                 fetchTodo(page);
             });
 
