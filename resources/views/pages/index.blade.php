@@ -9,7 +9,6 @@
    width: 20px;
    }
 </style>
-
 @endpush
 @section('content')
 <div class="mt-5 container">
@@ -20,7 +19,7 @@
       <table class="table table-striped mt-5">
          <thead>
             <tr>
-                <th>Title</th>
+               <th>Title</th>
                <th>Image</th>
                <th>Description</th>
                <th>Task</th>
@@ -29,15 +28,15 @@
          </thead>
          <tbody id="PrintTodo">
             <tr class="todoLoader" style="display: none;">
-                <td class="text-center" colspan="6">
-                    <div class="spinner-border" role="status">
-                        <span class="sr-only">Loading...</span>
-                      </div>
-                </td>
+               <td class="text-center" colspan="6">
+                  <div class="spinner-border" role="status">
+                     <span class="sr-only">Loading...</span>
+                  </div>
+               </td>
             </tr>
          </tbody>
       </table>
-    <div id="paginate"></div>
+      <div id="paginate"></div>
    </div>
 </div>
 {{-- Create Todo --}}
@@ -53,8 +52,7 @@
             <form method="POST" id="AddTodo" enctype="multipart/form-data" class="TodoValidate">
                <div class="todoModal">
                   <div class="row">
-
-                <div class="col-md-12 mb-3">
+                     <div class="col-md-12 mb-3">
                         <label for="">Title <span class="text-danger">*</span></label>
                         <input type="text" class="form-control todo_title" name="title">
                         <small class="text-danger" id="titleErrors"></small>
@@ -63,12 +61,12 @@
                         <label for="">Image</label>
                         <input type="file" name="image" class="form-control todo_image" id="image">
                         <small class="text-danger" id="imageErrors"></small>
-                    </div>
+                     </div>
                      <div class="col-md-12 mb-3">
                         <label for="">Description</label>
                         <textarea name="description" class="form-control" id="description" cols="15" rows="5"></textarea>
                         <small class="text-danger" id="descriptionErrors"></small>
-                    </div>
+                     </div>
                   </div>
                </div>
                <div style="float: right;">
@@ -133,50 +131,50 @@
 </div>
 {{-- View Todo --}}
 <div class="modal fade" id="EditTodoModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-       <div class="modal-content">
-          <div class="modal-header">
-             <h5 class="modal-title" id="exampleModalLabel">View Task</h5>
-             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-             <ul id="EdittodoErrorList"></ul>
-             <form method="POST" id="ViewTodo">
-                <input type="hidden" name="view_todo_id" id="view_todo_id">
-                <div class="todoModal">
-                   <div class="row">
-                      <div class="col-md-12 mb-3">
-                         <label for="">Title <span class="text-danger">*</span></label>
-                         <input type="text" class="form-control view_todo_title" name="title" id="view_todo_title">
-                         <small class="text-danger" id="EditTitleErrors"></small>
-                      </div>
-                      <div class="col-md-12 mb-3">
-                         <label for="">Image </label>
-                         <input type="file" name="image" class="form-control todo_image" id="image">
-                         <span id="view_todo_image"></span>
-                         <small class="text-danger" id="EditimageErrors"></small>
-                      </div>
-                      <div class="col-md-12 mb-3">
-                         <label for="">Description </label>
-                         <textarea name="description" class="form-control" id="view_todo_description" cols="15" rows="5"></textarea>
-                         <small class="text-danger" id="EditdescriptionErrors"></small>
-                      </div>
-                   </div>
-                </div>
-                <div style="float: right;">
-                   <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                   <button type="submit" class="btn btn-warning text-light me-sm-3 me-1">
-                      <div style="display: none;" class="loader spinner-border" role="status">
-                         <span class="sr-only">Loading...</span>
-                      </div>
-                      Update
-                   </button>
-                </div>
-             </form>
-          </div>
-       </div>
-    </div>
- </div>
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">View Task</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body">
+            <ul id="EdittodoErrorList"></ul>
+            <form method="POST" id="ViewTodo">
+               <input type="hidden" name="view_todo_id" id="view_todo_id">
+               <div class="todoModal">
+                  <div class="row">
+                     <div class="col-md-12 mb-3">
+                        <label for="">Title <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control view_todo_title" name="title" id="view_todo_title">
+                        <small class="text-danger" id="EditTitleErrors"></small>
+                     </div>
+                     <div class="col-md-12 mb-3">
+                        <label for="">Image </label>
+                        <input type="file" name="image" class="form-control todo_image" id="image">
+                        <span id="view_todo_image"></span>
+                        <small class="text-danger" id="EditimageErrors"></small>
+                     </div>
+                     <div class="col-md-12 mb-3">
+                        <label for="">Description </label>
+                        <textarea name="description" class="form-control" id="view_todo_description" cols="15" rows="5"></textarea>
+                        <small class="text-danger" id="EditdescriptionErrors"></small>
+                     </div>
+                  </div>
+               </div>
+               <div style="float: right;">
+                  <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-warning text-light me-sm-3 me-1">
+                     <div style="display: none;" class="loader spinner-border" role="status">
+                        <span class="sr-only">Loading...</span>
+                     </div>
+                     Update
+                  </button>
+               </div>
+            </form>
+         </div>
+      </div>
+   </div>
+</div>
 {{-- Delete Todo --}}
 <div class="modal fade" id="DeleteTodo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
    <div class="modal-dialog">
@@ -186,9 +184,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
-
             <input type="hidden" id="delete_todo_id">
-
             <div>
                <h5>Are you sure you want to delete this data?</h5>
             </div>
@@ -258,7 +254,7 @@
             });
         }
     })
-}
+   }
 
        $.ajaxSetup({
            headers: {
@@ -444,8 +440,6 @@
 
 
 
-    </script>
 
-
-
+</script>
 @endpush
